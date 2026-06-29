@@ -65,6 +65,19 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
+
+	stage('Unit Test') {
+ 	   steps {
+        	sh 'mvn test'
+    	    }
+	}		
+
+	stage('Publish JUnit Report') {
+    	   steps {
+        	junit '**/target/surefire-reports/*.xml'
+    	    }
+	}	
+
     }
 
     post {
