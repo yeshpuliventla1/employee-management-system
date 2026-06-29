@@ -3,36 +3,82 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven-3.8.4'
+        maven 'Maven3'
+        jdk 'JDK21'
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                echo 'Checking out source code...'
+                echo '===== Checking out source code ====='
                 checkout scm
             }
         }
 
-        stage('Build') {
+        stage('Environment Information') {
             steps {
-                echo 'Building Employee Management System...'
-                sh 'mvn clean package'
+                sh '''
+                    echo "===== Build Environment ====="
+
+                    echo "Hostname:"
+                    hostname
+
+                    echo "Current User:"
+                    whoami
+
+                    echo "Workspace:"
+                    pwd
+
+                    echo "Java Version:"
+                    java -version
+
+                    echo "Git Version:"
+                    git --version
+
+                    echo "Maven Version:"
+                    mvn -version
+
+                    echo "Memory Usage:"
+                    free -h
+
+                    echo "Disk Usage:"
+                    df -h
+                '''
+            }
+        }
+
+        stage('Build Validation') {
+            steps {
+                sh '''
+                    test -f pom.xml
+                    test -d src/main
+                    test -d src/test
+
+                    echo "Project structure validated successfully."
+                '''
+            }
+        }
+
+        stage('Compile') {
+            steps {
+                sh 'mvn clean compile'
             }
         }
     }
 
     post {
 
-        success {
-            echo 'Build Successful.'
+        always {
+            echo "Pipeline execution completed."
+        }
 
-            archiveArtifacts artifacts: 'target/*.jar'
+        success {
+            echo "Compilation completed successfully."
         }
 
         failure {
-            echo 'Build Failed.'
+            echo "Compilation failed."
         }
     }
 }
