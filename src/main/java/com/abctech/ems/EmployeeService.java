@@ -10,6 +10,10 @@ public class EmployeeService {
     public void addEmployee(Employee employee) {
         employees.add(employee);
     }
+	
+    public List<Employee> getEmployees() {
+        return employees;
+    }
 
     public void displayEmployees() {
 
