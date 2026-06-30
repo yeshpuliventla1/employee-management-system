@@ -89,7 +89,21 @@ pipeline {
                     reportName: 'JaCoCo Code Coverage'
                 ])
             }
-        }	
+        }
+
+        stage('Package') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+
+        stage('Archive Artifact') {
+            steps {
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
+
+
     }
 
     post {
