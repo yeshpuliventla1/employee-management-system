@@ -21,29 +21,21 @@ pipeline {
                 sh '''
                     echo "===== Build Environment ====="
 
-                    echo "Hostname:"
-                    hostname
+                    echo "Hostname: " hostname
 
-                    echo "Current User:"
-                    whoami
+                    echo "Current User: " whoami
 
-                    echo "Workspace:"
-                    pwd
+                    echo "Workspace: " pwd
 
-                    echo "Java Version:"
-                    java -version
+                    echo "Java Version: " java -version
 
-                    echo "Git Version:"
-                    git --version
+                    echo "Git Version: " git --version
 
-                    echo "Maven Version:"
-                    mvn -version
+                    echo "Maven Version: " mvn -version                    
 
-                    echo "Memory Usage:"
-                    free -h
+                    echo "Memory Usage: " free -h                    
 
-                    echo "Disk Usage:"
-                    df -h
+                    echo "Disk Usage: " df -h                    
                 '''
             }
         }
@@ -66,18 +58,30 @@ pipeline {
             }
         }
 
-	stage('Unit Test') {
- 	   steps {
-        	sh 'mvn test'
-    	    }
-	}		
+        stage('Unit Test') {
+        steps {
+                sh 'mvn test'
+                }
+        }		
 
-	stage('Publish JUnit Report') {
-    	   steps {
-        	junit '**/target/surefire-reports/*.xml'
-    	    }
-	}	
+        stage('Publish JUnit Report') {
+            steps {
+                junit '**/target/surefire-reports/*.xml'
+                }
+        }
 
+        stage('Publish JaCoCo Report') {
+            steps {
+                publishHTML([
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'target/site/jacoco',
+                    reportFiles: 'index.html',
+                    reportName: 'JaCoCo Code Coverage'
+                ])
+            }
+        }	
     }
 
     post {
